@@ -80,27 +80,35 @@ function Avatar({ name }) {
   return <div className={styles.avatar}>{getInitials(name)}</div>;
 }
 
-export default function Home() {
-  const [syncState, setSyncState] = useState("idle"); // idle | loading | success | error
-  const [previewSynced, setPreviewSynced] = useState(false);
+function capitalize(value) {
+  if (!value) return value;
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
-  async function handleSync() {
-    setSyncState("loading");
-    setPreviewSynced(false);
+function formatLifecycleStage(stage) {
+  if (!stage) return stage;
+  return stage
+    .split("_")
+    .map((word) => capitalize(word))
+    .join(" ");
+}
+
+export default function Home() {
+  const [statusCheck, setStatusCheck] = useState("idle"); // idle | loading | loaded | error
+  const [statusResult, setStatusResult] = useState(null);
+
+  async function handleCheckStatus() {
+    setStatusCheck("loading");
     try {
-      const res = await fetch("/api/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
+      const res = await fetch("/api/employee-status");
       const data = await res.json();
-      setSyncState(data.sandboxError ? "error" : "success");
-    } catch {
-      setSyncState("error");
+      setStatusResult(data);
+      setStatusCheck(data.sandboxError ? "error" : "loaded");
+    } catch (err) {
+      setStatusResult({ sandboxError: true, error: err.message });
+      setStatusCheck("error");
     }
   }
-
-  const showingTakenStyle = syncState === "success" || previewSynced;
 
   return (
     <div className={`${styles.page} ${fustat.className}`}>
@@ -144,8 +152,11 @@ export default function Home() {
           </div>
 
           <p className={styles.contextLine}>
-            BambooHR already syncs automatically for EOR employees — Personio
-            doesn&apos;t yet. The row below shows that gap.
+            GP employees sync from Personio into Remote. EOR employees work
+            the other way — tracked in Remote first, with approvals
+            surfacing in Personio&apos;s inbox. These two paths aren&apos;t
+            connected in one view today. This row shows what a unified view
+            could look like.
           </p>
 
           <div className={styles.toolbarInert}>
@@ -219,20 +230,22 @@ export default function Home() {
                     <span className={styles.statusCell}>
                       <span
                         className={
-                          showingTakenStyle
-                            ? styles.dotTaken
-                            : syncState === "error"
-                              ? styles.dotError
+                          statusCheck === "loaded"
+                            ? statusResult?.employment?.status === "active"
+                              ? styles.dotTaken
                               : styles.dotWarning
+                            : statusCheck === "error"
+                              ? styles.dotError
+                              : styles.dotMuted
                         }
                       />
-                      {previewSynced
-                        ? "Taken (preview)"
-                        : syncState === "success"
-                          ? "Taken"
-                          : syncState === "error"
-                            ? "Sync failed"
-                            : "Not synced"}
+                      {statusCheck === "loaded"
+                        ? capitalize(statusResult?.employment?.status)
+                        : statusCheck === "error"
+                          ? "Could not load"
+                          : statusCheck === "loading"
+                            ? "Checking…"
+                            : "Not checked yet"}
                     </span>
                   </td>
                   <td>Vacation</td>
@@ -246,39 +259,46 @@ export default function Home() {
                     </span>
                   </td>
                   <td className={styles.notesCell}>
-                    {previewSynced ? (
-                      <span className={styles.notesPreview}>
-                        Preview only — the live sync above still returned a
-                        sandbox error.
-                      </span>
-                    ) : syncState === "success" ? (
-                      "—"
-                    ) : syncState === "error" ? (
-                      <div className={styles.errorStack}>
-                        <span className={styles.notesError}>
-                          Sync failed — Remote&apos;s sandbox returned an
-                          error here.
-                        </span>
-                        <button
-                          className={styles.previewLink}
-                          type="button"
-                          onClick={() => setPreviewSynced(true)}
-                        >
-                          See what this looks like once synced →
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        className={styles.syncButton}
-                        onClick={handleSync}
-                        disabled={syncState === "loading"}
-                        type="button"
-                      >
-                        {syncState === "loading"
-                          ? "Syncing…"
-                          : "Sync from Personio"}
-                      </button>
+                    <p className={styles.sourceNote}>
+                      Source of truth: Remote (EOR employer). Approvals go
+                      to Personio Inbox.
+                    </p>
+
+                    {statusCheck === "loaded" && statusResult?.employment && (
+                      <p className={styles.statusDetail}>
+                        {formatLifecycleStage(
+                          statusResult.employment.employment_lifecycle_stage
+                        )}
+                        {statusResult.employment.available_pto != null &&
+                          ` · ${statusResult.employment.available_pto} days PTO available`}
+                      </p>
                     )}
+
+                    {statusCheck === "error" && (
+                      <p className={styles.notesError}>
+                        {statusResult?.status
+                          ? `Remote returned ${statusResult.status}${
+                              statusResult.statusText
+                                ? ` (${statusResult.statusText})`
+                                : ""
+                            }.`
+                          : statusResult?.error ||
+                            "Could not reach Remote's sandbox."}
+                      </p>
+                    )}
+
+                    <button
+                      className={styles.syncButton}
+                      onClick={handleCheckStatus}
+                      disabled={statusCheck === "loading"}
+                      type="button"
+                    >
+                      {statusCheck === "loading"
+                        ? "Checking…"
+                        : statusCheck === "idle"
+                          ? "View live status from Remote"
+                          : "Refresh status"}
+                    </button>
                   </td>
                 </tr>
               </tbody>
