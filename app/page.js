@@ -260,8 +260,8 @@ export default function Home() {
                   </td>
                   <td className={styles.notesCell}>
                     <p className={styles.sourceNote}>
-                      Source of truth: Remote (EOR employer). Approvals go
-                      to Personio Inbox.
+                      Native EOR record — requested here directly, approval
+                      routed to Personio Inbox.
                     </p>
 
                     {statusCheck === "loaded" && statusResult?.employment && (
@@ -296,7 +296,7 @@ export default function Home() {
                       {statusCheck === "loading"
                         ? "Checking…"
                         : statusCheck === "idle"
-                          ? "View live status from Remote"
+                          ? "Refresh"
                           : "Refresh status"}
                     </button>
                   </td>
