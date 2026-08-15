@@ -291,7 +291,8 @@
 
 .dotTaken,
 .dotWarning,
-.dotError {
+.dotError,
+.dotMuted {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -308,6 +309,10 @@
 
 .dotError {
   background-color: var(--dot-error);
+}
+
+.dotMuted {
+  background-color: var(--text-muted);
 }
 
 .countryCell {
@@ -329,6 +334,21 @@
   color: var(--error-text);
   font-size: 13.5px;
   line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.sourceNote {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.statusDetail {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 8px;
 }
 
 .notesPreview {
