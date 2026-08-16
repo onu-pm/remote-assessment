@@ -210,19 +210,22 @@ export default function SyncAdoptionGapBrief() {
               <div
                 className={styles.refLine}
                 style={{ left: `${customerPct}%` }}
-              >
-                <span className={styles.refLabel}>
-                  Customer limit: {formatNumber(CUSTOMER_LIMIT)}/min
-                </span>
-              </div>
+              />
               <div
                 className={styles.refLine}
                 style={{ left: `${partnerPct}%` }}
-              >
-                <span className={styles.refLabel}>
-                  Partner limit: {formatNumber(PARTNER_LIMIT)}/min
-                </span>
-              </div>
+              />
+            </div>
+
+            <div className={styles.refLegend}>
+              <span className={styles.refLegendItem}>
+                <span className={styles.refSwatch} />
+                Customer limit: {formatNumber(CUSTOMER_LIMIT)}/min
+              </span>
+              <span className={styles.refLegendItem}>
+                <span className={styles.refSwatch} />
+                Partner limit: {formatNumber(PARTNER_LIMIT)}/min
+              </span>
             </div>
 
             <p className={styles.calculatorCaption}>

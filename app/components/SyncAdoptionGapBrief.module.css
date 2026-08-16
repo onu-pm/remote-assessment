@@ -261,14 +261,29 @@
   opacity: 0.55;
 }
 
-.refLabel {
-  position: absolute;
-  top: -22px;
-  left: 4px;
-  font-size: 10.5px;
+.refLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.refLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
   font-weight: 600;
-  white-space: nowrap;
   color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.refSwatch {
+  display: inline-block;
+  width: 10px;
+  height: 2px;
+  background-color: var(--text-primary);
+  opacity: 0.55;
 }
 
 .calculatorCaption {
