@@ -117,8 +117,9 @@ export default function Home() {
       </div>
 
       <p className={styles.caseStudyIntro}>
-        Case study: does Personio&apos;s EOR time-off actually have a gap? —
-        short version: no, and here&apos;s the corrected finding, live.
+        Case study: two time-off systems, both correct, not labelled against
+        each other. This table shows the fix — the authoritative system
+        called out inline, not buried in a help article.
       </p>
 
       <div className={styles.shell}>
